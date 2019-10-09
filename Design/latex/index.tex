@@ -1,0 +1,27 @@
+\hypertarget{index_Introduction}{}\section{Introduction}\label{index_Introduction}
+This is a C implementation of the Needham Schroeder Symmetric Key Protocol, based on the previous work \href{https://github.com/abender/needham-schroeder}{\tt se\-N\-S} done by Andreas Bender. This implementation includes timpstamp to defeat the \href{http://en.wikipedia.org/wiki/Needham-Schroeder_protocol}{\tt replay attack} . The project is going to extend se\-N\-S in the following ways\-:
+\begin{DoxyItemize}
+\item Implement tests
+\item Implement additional encryption methods
+\item Transmission error detection
+\item Check cleanups
+\item Implement easy-\/to-\/use A\-P\-Is
+\item Fix bugs
+\end{DoxyItemize}\hypertarget{index_Design}{}\section{Design}\label{index_Design}
+The design includes A\-P\-Is and a simple driver program. To understand the design, it's necessary to understand how the protocol works. Below is the message flow\-:\par
+
+\begin{DoxyItemize}
+\item A-\/$>$S\-: A,B,Na\par
+
+\item S-\/$>$A\-: \{Na, Kab, B, \{Kab, A, T\}Kbs\}Kas\par
+
+\item A-\/$>$B\-: \{Kab, A, T\}Kbs\par
+
+\item B-\/$>$A\-: \{Nb\}Kab\par
+
+\item A-\/$>$B\-: \{Nb-\/1\}Kab
+\end{DoxyItemize}
+
+There are 3 roles here, A, B and S. We call A as client, B as daemon and S as server. There are A\-P\-Is for each role, take setup for example, there are ns\-\_\-setup\-\_\-client, ns\-\_\-setup\-\_\-daemon, ns\-\_\-setup\-\_\-server for each role. In the setup, data structures for storing keys are created and network related operations, such as Bind,Listen are performed. Each role can pass port number and encryption method to setup, otherwise, the default is used.\par
+ After setup, daemon and server can simply call ns\-\_\-daemon\-\_\-loop\-\_\-simple and ns\-\_\-server\-\_\-loop respectively to enter default message handling loop. If daemon needs to do additional message handling, a callback can be passed to ns\-\_\-daemon\-\_\-loop. The client needs to call ns\-\_\-client\-\_\-negotiate\-\_\-keys to initiate the key negotiation. After that, the client can call ns\-\_\-client\-\_\-send\-\_\-msg to send encrypted messages to daemon, using the negotiated share key.\par
+ The driver program serves as a simple example of using the A\-P\-I and also a simple test case. It creates 3 processes, one for the server, one for the daemon and one for the client. A\-P\-Is are called by the driver program to perform key negotiation. After that, A simple hello message is sent from the client to the daemon. Additional test/driver will be implemented later. 
